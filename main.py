@@ -1,44 +1,54 @@
 import streamlit as st
-import smtplib, ssl
+import smtplib
+from email.message import EmailMessage
 
 #Provides tab title and icon
-st.set_page_config(layout="centered", page_title="Mondrean", page_icon="🖌️")
+st.set_page_config(layout="centered", page_title="Deadnettle Farms", page_icon="🌿")
 
 #Creates container for vertical stack of elements
 with st.container():
 
     #Creates header image and text input box
-    st.image("https://raw.githubusercontent.com/OneCityCode/Test/main/Streamlit/Title.png")
+    st.image("https://raw.githubusercontent.com/OneCityCode/Deadnettle/main/dnf.png")
 
-    st.title("Please use the contact form below for inquiries")
+    st.subheader("Please use the contact form below for inquiries:")
 
-    uname = st.text_input("", max_chars=50, placeholder="Name")
-    uphone = st.text_input("", max_chars=50, placeholder="Phone Number")
-    umail = st.text_input("", max_chars=50, placeholder="email adress")
-    uaddress = st.text_input("", max_chars=50, placeholder="delivery address (if applicable)")
-    unotes = st.text_area("", max_chars=1000, placeholder="delivery address")
+    uname = st.text_input("name", max_chars=50, placeholder="Name", label_visibility="hidden")
+    uphone = st.text_input("phone", max_chars=50, placeholder="Phone Number", label_visibility="hidden")
+    umail = st.text_input("email", max_chars=50, placeholder="email adress", label_visibility="hidden")
+    uaddress = st.text_input("address", max_chars=50, placeholder="delivery address (if applicable)", label_visibility="hidden")
+    udate = st.text_input("date", max_chars=50, placeholder="desired delivery date", label_visibility="hidden")
+    unotes = st.text_area("notes", max_chars=1000, placeholder="Additional notes (if applicable)", label_visibility="hidden")
 
     if st.button("Submit", type = "primary"):
-        port = 465  # For SSL
-        smtp_server = "smtp.gmail.com"
-        sender_email = st.secrets["dnsendaddress"]  # Enter your address
-        receiver_email = st.secrets["dnreceiveaddress"]  # Enter receiver address
-        password = st.secrets["dnsendpass"]
-        message = f"""\
-        Subject: You have a new customer contact at Deadnettle Farms!
-        Customer information:
-        Name: {uname}
-        Phone Number: {uphone}
-        Email: {umail}
-        Address: {uaddress}
-        Additional notes: {unotes}
-        """
-
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-            server.login(sender_email, password)
-            server.sendmail(sender_email, receiver_email, message)
-
-        server.quit() 
-
-        st.write("Successfully Sent!")
+        
+        
+        try:
+            msg = f"""\
+                Customer information:
+                
+                Name: {uname}
+                
+                Phone Number: {uphone}
+                
+                Email: {umail}
+                
+                Address: {uaddress}
+                
+                Requested delivery date: {udate}
+                
+                Additional notes: {unotes}
+                """
+            fmsg = EmailMessage()
+            fmsg.set_content(msg)
+            fmsg['Subject'] = f'{uname} contacted you at Deadnettle Farms!'
+            fmsg['From'] = st.secrets["dnsendaddress"]
+            fmsg['To'] = st.secrets["dnreceiveaddress"]
+            server_ssl = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+            server_ssl.ehlo() # optional, called by login()
+            server_ssl.login(st.secrets["dnsendaddress"], st.secrets["dnsendpass"])  
+            server_ssl.send_message(fmsg)
+            server_ssl.close()
+            st.write("Sent successfully!")
+        except:
+            st.write("Failed to send")
