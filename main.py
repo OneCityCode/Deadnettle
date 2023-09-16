@@ -16,8 +16,7 @@ with st.container():
     uname = st.text_input("name", max_chars=50, placeholder="Name", label_visibility="hidden")
     uphone = st.text_input("phone", max_chars=50, placeholder="Phone Number", label_visibility="hidden")
     umail = st.text_input("email", max_chars=50, placeholder="email adress", label_visibility="hidden")
-    uaddress = st.text_input("address", max_chars=50, placeholder="delivery address (if applicable)", label_visibility="hidden")
-    udate = st.text_input("date", max_chars=50, placeholder="desired delivery date", label_visibility="hidden")
+    udate = st.text_input("date", max_chars=50, placeholder="requested ready date", label_visibility="hidden")
     unotes = st.text_area("notes", max_chars=1000, placeholder="Additional notes (if applicable)", label_visibility="hidden")
 
     if st.button("Submit", type = "primary"):
@@ -32,8 +31,6 @@ with st.container():
                 Phone Number: {uphone}
                 
                 Email: {umail}
-                
-                Address: {uaddress}
                 
                 Requested delivery date: {udate}
                 
